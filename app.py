@@ -15,6 +15,8 @@ api = Api(app)
 migrate = Migrate(app, db)
 CORS(app)
 
+
+# routes
 class Signup(Resource):
     def post(self):
         data = request.get_json()
