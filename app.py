@@ -2,6 +2,7 @@
 
 from flask import Flask, jsonify, request, make_response
 from flask_migrate import Migrate
+from flask_cors import CORS
 from flask_restful import Api, Resource
 from models import db, User, Course, Enrollment, CourseContent
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -12,7 +13,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 api = Api(app)
 migrate = Migrate(app, db)
-
+CORS(app)
 
 class Signup(Resource):
     def post(self):
@@ -74,6 +75,18 @@ class UserResource(Resource):
             user.password = data['password']
             user.email = data['email']
             user.profile_info = data.get('profile_info')
+            db.session.commit()
+            return jsonify(user.as_dict())
+        return {'message': 'User not found'}, 404
+    
+    def patch(self, user_id):
+        user = User.query.get(user_id)
+        if user:
+            data = request.get_json()
+            if 'username' in data:
+                user.username = data['username']
+            if 'email' in data:
+                user.email = data['email']
             db.session.commit()
             return jsonify(user.as_dict())
         return {'message': 'User not found'}, 404

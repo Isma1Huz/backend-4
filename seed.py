@@ -1,8 +1,12 @@
 import random
+import requests
+from flask import request, jsonify, make_response
 from faker import Faker
 from app import app, db, User, Course, Enrollment, CourseContent
 
 fake = Faker()
+
+UNSPLASH_API_KEY = "1tzv_QUdaWTWvrIT-r6OgzTGHI1RxRxm6OVuaPvWjZA" 
 
 # Function to create fake users
 def create_fake_users(num_users):
@@ -16,7 +20,22 @@ def create_fake_users(num_users):
         users.append(user)
     return users
 
-# Function to create fake courses
+def get_technology_image_url():
+    headers = {
+        "Authorization": f"Client-ID {UNSPLASH_API_KEY}"
+    }
+
+    # Search for technology-related images using the Unsplash API
+    response = requests.get("https://api.unsplash.com/photos/random", headers=headers, params={"query": "technology"})
+    
+    if response.status_code == 200:
+        data = response.json()
+        if "urls" in data:
+            return data["urls"]["regular"]
+    
+    return None
+
+# Function to create fake courses with technology-related images
 def create_fake_courses(num_courses, instructors):
     courses = []
     for _ in range(num_courses):
@@ -25,7 +44,16 @@ def create_fake_courses(num_courses, instructors):
         category = fake.word()
         instructor = random.choice(instructors)
         enrollment_limit = random.randint(1, 100)
-        course = Course(title=title, description=description, category=category, instructor=instructor, enrollment_limit=enrollment_limit)
+        image = get_technology_image_url()
+        
+        course = Course(
+            title=title,
+            description=description,
+            category=category,
+            instructor=instructor,
+            enrollment_limit=enrollment_limit,
+            image=image 
+        )
         courses.append(course)
     return courses
 

@@ -53,6 +53,7 @@ class Course(db.Model):
     instructor_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     enrollment_limit = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    image = db.Column(db.String(255)) 
 
     enrollments = db.relationship('Enrollment', backref='course', lazy=True)
     contents = db.relationship('CourseContent', backref='course', lazy=True)
@@ -65,8 +66,10 @@ class Course(db.Model):
             'category': self.category,
             'instructor_id': self.instructor_id,
             'enrollment_limit': self.enrollment_limit,
-            'created_at': self.created_at
+            'created_at': self.created_at,
+            'image': self.image  
         }
+
 
 # Define the Enrollment model
 class Enrollment(db.Model):
